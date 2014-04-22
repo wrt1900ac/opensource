@@ -27,12 +27,11 @@ How to build the openwrt:
 2. Make sure the server is connected to the Internet.
    
 3. Preparation:
-   Extract the release source from tarball
-   # tar xzfv mamba-openwrt-v3.5.tar.gz
+   Move into the mamba-openwrt-v3.5 directory
+   # cd mamba-openwrt-v3.5
    
    Update packages and luci for some advanced features ( such as 
    Web Management).
-   # cd mamba-openwrt
    # ./scripts/feeds update packages
    # ./scripts/feeds update luci
    # ./scripts/feeds update routing
@@ -51,8 +50,6 @@ How to build the openwrt:
 
 
 4. Configuration the openwrt:
-   # cd mamba-openwrt
-
    To enable/disable packages manually:
    # make menuconfig 
 
