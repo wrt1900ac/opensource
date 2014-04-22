@@ -20,7 +20,7 @@ How to update from Belkin/Linksys UI
   The default username for OpwnWrt is 'root', and there is no default password set.  
   The unit will ask you to set a default password after you login to the UI.
   
-How to ipdate from OpenWrt to Belkin/Linksys
+How to update from OpenWrt to Belkin/Linksys
   Login to the WRT1900AC web UI
   Select the 'System' Tab, and then 'Backup / Flash Firmware' tab
   In the 'Flash new firmware image' section click the 'choose file' button and select your firmware
