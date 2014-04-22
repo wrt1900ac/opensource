@@ -1,0 +1,279 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-11-02 05:36+0200\n"
+"PO-Revision-Date: 2012-02-24 22:45+0200\n"
+"Last-Translator: Luiz Angelo <luizluca@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Pootle 2.0.4\n"
+
+msgid "Accept"
+msgstr "Aceitar"
+
+msgid ""
+"Access to the internet might be possible nevertheless, because some "
+"activists of this project share their private internet connections. These "
+"few connections are shared between all users. That means available bandwidth "
+"is limited and because of this we ask you not to do any of the following:"
+msgstr ""
+"O acesso à internet, no entanto, pode ser possível porque alguns ativistas "
+"deste projeto compartilham duas conexões privadas com a internet. Estas "
+"poucas conexões são compartilhadas entre todos os usuários. Isto significa "
+"que a banda disponível é limitada e, por este motivo, pedimos que você não "
+"faça qualquer uma destas coisas:"
+
+msgid "Active Clients"
+msgstr "Clientes Ativos"
+
+msgid "Allowed hosts/subnets"
+msgstr "Subredes/equipamentos permitidos"
+
+msgid ""
+"Bandwidth limit for clients is only activated when both up- and download "
+"limit are set. Use a value of 0 here to completely disable this limitation. "
+"Whitelisted clients are not limited."
+msgstr ""
+"O limite da taxa de transferência somente é ativado quando ambos os limites, "
+"para subir e baixar, estão definidos. Use o valor 0 para desabilitar "
+"completamente esta limitação. Clientes na lista branca não são limitados."
+
+msgid ""
+"Become an active member of this community and help by operating your own node"
+msgstr ""
+"Torne-se um membro ativo desta comunidade e ajude operando seu próprio nó."
+
+msgid "Blacklist"
+msgstr "Lista negra"
+
+msgid "Blocked"
+msgstr "Bloqueado"
+
+msgid "By accepting these rules you can use this network for"
+msgstr "Aceitando estas regras, você pode usar esta rede para"
+
+msgid "Clearance time"
+msgstr "Tempo de eliminação"
+
+msgid "Client-Splash"
+msgstr "Client-Splash"
+
+msgid ""
+"Client-Splash is a hotspot authentification system for wireless mesh "
+"networks."
+msgstr ""
+"Client-Splash é um sistema de autenticação de ponto de acesso para redes sem "
+"fio em malha."
+
+msgid "Clients download speed is limited to this value (kbyte/s)"
+msgstr ""
+"A velocidade para baixar dos clientes é limitada por este valor (kbytes/s)"
+
+msgid ""
+"Clients that have accepted the splash are allowed to use the network for "
+"that many hours."
+msgstr ""
+"Os clientes que aceitarem o termo de uso estarão autorizados a usar a rede "
+"por esta quantidade de horas."
+
+msgid "Clients upload speed is limited to this value (kbyte/s)"
+msgstr ""
+"A velocidade para subir dos clientes é limitada por este valor (kbytes/s)"
+
+msgid "Contact"
+msgstr "Contato"
+
+msgid "Decline"
+msgstr "Rejeitar"
+
+msgid "Donate some money to help us keep this project alive."
+msgstr "Doar algum dinheiro para ajudar a manter este projeto vivo."
+
+msgid "Download limit"
+msgstr "Limite para baixar"
+
+msgid "Edit Splash text"
+msgstr "Editar texto do termo de uso"
+
+msgid "Firewall zone"
+msgstr "Zona do Firewall"
+
+msgid "General"
+msgstr "Geral"
+
+msgid "Hostname"
+msgstr "Nome do Equipamento"
+
+msgid ""
+"Hosts and Networks that are listed here are excluded from splashing, i.e. "
+"they are always allowed."
+msgstr ""
+"Equipamentos ou Redes listadas aqui estarão excluídas do termo de uso. Eles "
+"estarão sempre autorizados."
+
+msgid "IP Address"
+msgstr "Endereço IP"
+
+msgid ""
+"If you operate your own wifi equipment use channels different from ours."
+msgstr ""
+"Se você opera seu próprio equipamento WiFi, use canais diferentes dos nossos."
+
+msgid "If you use this network on a regular basis we ask for your support:"
+msgstr "Se você usa esta rede regularmente, nós pedimos a sua ajuda:"
+
+msgid "Intercept client traffic on this Interface"
+msgstr "Interceptar o tráfego do cliente nesta interface"
+
+msgid "Interfaces"
+msgstr "Interfaces"
+
+msgid "Interfaces that are used for Splash."
+msgstr "Interfaces usadas pelo Splash."
+
+msgid ""
+"KB/s (Download/Upload). You may be able to remove this limit by actively "
+"contributing to this project."
+msgstr ""
+"KB/s (Baixando/Subindo). Você pode remover esta limitação contribuindo "
+"ativamente para este projeto."
+
+msgid "MAC Address"
+msgstr "Endereço MAC"
+
+msgid "MAC addresses in this list are blocked."
+msgstr "Os endereços MAC nesta lista serão bloqueados."
+
+msgid ""
+"MAC addresses of whitelisted clients. These do not need to accept the splash "
+"and are not bandwidth limited."
+msgstr ""
+"Endereços MAC dos clientes na lista branca. Estes não precisam aceitar o "
+"termo de uso e não possuem limitação na sua taxa de transferência."
+
+msgid "Netmask"
+msgstr "Máscara de Rede"
+
+msgid "Network"
+msgstr "Rede"
+
+msgid "No clients connected"
+msgstr "Nenhum cliente conectado"
+
+msgid ""
+"Please note that we are not an internet service provider but an experimental "
+"community network."
+msgstr ""
+"Observe que nós não somos um provedor de internet mas uma rede comunitária "
+"experimental."
+
+msgid "Policy"
+msgstr "Política"
+
+msgid "Save"
+msgstr "Salvar"
+
+msgid "Splash rules are integrated in this firewall zone"
+msgstr "As regras do Slapsh estão integradas a esta zona do firewall"
+
+msgid "Splashtext"
+msgstr "Texto do termo de uso"
+
+msgid "Time remaining"
+msgstr "Tempo restante"
+
+msgid ""
+"To ask for the reason why you have been blocked or ask for access again you "
+"can try to contact the owner of this access point:"
+msgstr ""
+"Para perguntar por qual razão você foi bloqueado ou para solicitar novamente "
+"seu acesso, você pode tentar contatar o dono deste ponto de acesso:"
+
+msgid "Traffic in/out"
+msgstr "Tráfego de entrada/saída"
+
+msgid "Upload limit"
+msgstr "Limite de subida"
+
+msgid "Welcome"
+msgstr "Bem-vindo"
+
+msgid "Whitelist"
+msgstr "Lista branca"
+
+msgid "You are now connected to the free wireless mesh network"
+msgstr "Você está agora conectado à rede livre em malha sem fio"
+
+msgid ""
+"You can enter your own text that is displayed to clients here.<br />It is "
+"possible to use the following markers: ###COMMUNITY###, ###COMMUNITY_URL###, "
+"###CONTACTURL###, ###LEASETIME###, ###LIMIT### and ###ACCEPT###."
+msgstr ""
+"Vocẽ pode entrar aqui com seu próprio texto que será mostrado para os "
+"clientes.<br />É possível usar os seguintes marcadores: ###COMMUNITY###, "
+"###COMMUNITY_URL###, ###CONTACTURL###, ###LEASETIME###, ###LIMIT### and "
+"###ACCEPT###."
+
+msgid ""
+"Your access to this network has been blocked, most likely because you did "
+"something that our rules explicitly forbid."
+msgstr ""
+"Seu acesso para esta rede foi bloqueado, provavelmente porque você fez algo "
+"que as regras explicitamente proibiam."
+
+msgid "Your bandwidth is limited to"
+msgstr "Sua banda está limitada à"
+
+msgid "blacklisted"
+msgstr "na lista negra"
+
+msgid "expired"
+msgstr "expirado"
+
+msgid "hour(s). After this time you need to accept these rules again."
+msgstr ""
+"horas(s). Depois deste tempo, você terá que aceitar as regras novamente."
+
+msgid "optional when using host addresses"
+msgstr "opcional quando é usado o endereço do equipamento"
+
+msgid "perform any kind of illegal activities"
+msgstr "realizar qualquer tipo de atividades ilegais"
+
+msgid "splashed"
+msgstr "termo mostrado"
+
+msgid "temporarily blocked"
+msgstr "bloqueado temporariamente"
+
+msgid "the owner of this access point."
+msgstr "o dono deste ponto de acesso."
+
+msgid "unknown"
+msgstr "desconhecido"
+
+msgid "use filesharing applications on this network"
+msgstr "usar aplicativos de compartilhamento de arquivos nesta rede"
+
+msgid "waste bandwidth with unneccesary downloads or streams"
+msgstr "usar banda com fluxos ou arquivos baixados não necessários"
+
+msgid "whitelisted"
+msgstr "na lista branca"
+
+#~ msgid ""
+#~ "You can change the text that is displayed to clients here.<br /> It is "
+#~ "possible to use the following markers: ###COMMUNITY###, "
+#~ "###COMMUNITY_URL###, ###LEASETIME### and ###ACCEPT###.<br />Click here to "
+#~ "<a href='/luci/splash/'>test the splash page</a> after you saved it."
+#~ msgstr ""
+#~ "Aqui você pode mudar o texto do termo de uso que é mostrado aos clientes."
+#~ "<br /> É possível usar as seguintes marcações: ###COMMUNITY###, "
+#~ "###COMMUNITY_URL###, ###LEASETIME### e ###ACCEPT###.<br />Clique aqui "
+#~ "para <a href='/luci/splash/'>testar a página de termo de uso</a> depois "
+#~ "que você salvá-la."

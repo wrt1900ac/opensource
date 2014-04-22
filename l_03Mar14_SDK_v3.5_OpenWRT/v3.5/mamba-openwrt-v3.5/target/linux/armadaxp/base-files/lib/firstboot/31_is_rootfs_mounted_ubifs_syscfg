@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Copyright (C) 2006-2010 OpenWrt.org
+# Copyright (C) 2010 Vertical Communications
+
+skip_if_rootfs_mounted() {
+	mtdpart_idx="$(echo $mtdpart | tr -d "/dev/mtdblock")"
+	[ ! -e /dev/ubi0 ] && ubiattach -m $mtdpart_idx /dev/ubi_ctrl 
+	if [ -e /dev/ubi0_0 ] 
+	then
+		{ ubinfo /dev/ubi0_0 | grep Name  | grep -qs syscfg ; } || exit
+		mount -t ubifs ubi0:syscfg /rom/overlay || exit 
+		[ ! -d /rom/overlay/openwrt_overlay ] && mkdir -p /rom/overlay/openwrt_overlay
+	else
+		echo "ubifs syscfg partition is damaged"
+		echo "recover ubifs by formatting $mtdpart..."
+		[ -e /dev/ubi0 ] && ubidetach -m $mtdpart_idx
+		ubiformat -y -q /dev/mtd$mtdpart_idx
+		ubiattach -m $mtdpart_idx /dev/ubi_ctrl
+		ubimkvol /dev/ubi0 -n 0 -N syscfg -t dynamic --maxavsize
+		mount -t ubifs ubi0:syscfg /overlay 
+		[ ! -d /overlay/openwrt_overlay ] && mkdir /overlay/openwrt_overlay
+	fi
+}

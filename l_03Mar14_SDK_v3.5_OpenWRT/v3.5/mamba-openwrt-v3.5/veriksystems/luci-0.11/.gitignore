@@ -1,0 +1,6 @@
+dist/
+/host
+*.o
+*.so
+*.swp
+/docs

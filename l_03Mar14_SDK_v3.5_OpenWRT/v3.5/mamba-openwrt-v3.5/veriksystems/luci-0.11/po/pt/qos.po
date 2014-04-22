@@ -1,0 +1,128 @@
+#  qos.po
+#  generated from ./applications/luci-qos/luasrc/i18n/qos.en.lua
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-03-25 22:10+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 1.1.1\n"
+
+#, fuzzy
+msgid "Calculate overhead"
+msgstr "Calcular Overhead"
+
+#, fuzzy
+msgid "Classification Rules"
+msgstr "Classificação"
+
+#, fuzzy
+msgid "Classification group"
+msgstr "Classificação"
+
+msgid "Destination host"
+msgstr ""
+
+msgid "Downlink"
+msgstr "Link para download"
+
+msgid "Download speed (kbit/s)"
+msgstr ""
+
+msgid "Enable"
+msgstr ""
+
+#, fuzzy
+msgid "Half-duplex"
+msgstr "Link para upload"
+
+msgid "Interfaces"
+msgstr ""
+
+msgid "Internet Connection"
+msgstr ""
+
+msgid "Number of bytes"
+msgstr ""
+
+#, fuzzy
+msgid "Ports"
+msgstr "Prioridade"
+
+msgid "Protocol"
+msgstr ""
+
+msgid "QoS"
+msgstr ""
+
+msgid "Quality of Service"
+msgstr "Qualidade de Serviço"
+
+msgid "Service"
+msgstr ""
+
+#, fuzzy
+msgid "Source host"
+msgstr "Endereço de origem"
+
+#, fuzzy
+msgid "Target"
+msgstr "Endereço de destino"
+
+msgid "Uplink"
+msgstr "Link para upload"
+
+msgid "Upload speed (kbit/s)"
+msgstr ""
+
+#, fuzzy
+msgid ""
+"With <abbr title=\"Quality of Service\">QoS</abbr> you can prioritize "
+"network traffic selected by addresses, ports or services."
+msgstr ""
+"Com QoS você pode priozirar o tráfego da rede selecionada por endereços, "
+"portas ou serviços."
+
+msgid "all"
+msgstr ""
+
+msgid "allf"
+msgstr ""
+
+msgid "default"
+msgstr ""
+
+msgid "express"
+msgstr "expressa"
+
+msgid "low"
+msgstr "baixa"
+
+msgid "normal"
+msgstr "normal"
+
+msgid "priority"
+msgstr "alta"
+
+msgid "qos_connbytes"
+msgstr ""
+
+#~ msgid "Prioritization"
+#~ msgstr "Priorização"
+
+#~ msgid "source network / source host"
+#~ msgstr "rede de origem / host de origem"
+
+#~ msgid "target network / target host"
+#~ msgstr "rede de destino / host de destino"
+
+#~ msgid "portrange"
+#~ msgstr "faixa de portas"
+
+#~ msgid "Bytes sent"
+#~ msgstr "Bytes enviados"

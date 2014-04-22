@@ -1,0 +1,224 @@
+#!/bin/sh /etc/rc.common
+
+# Copyright (C) 2013 Qualcomm Innovation Center, Inc.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+START=65
+
+SERVICE_PID_FILE=/var/run/alljoyn.pid
+
+CONFIGFILE="/var/etc/alljoyn.conf"
+
+
+check() {
+    local flag
+
+    config_get_bool flag "$1" "$2" 0
+
+    test "$flag" == "1"
+    return $?
+}
+
+
+process_network() {
+    local network="$1"
+    local var="$2"
+    local ifname
+
+    config_get ifname "$network" ifname
+    if [ -n "$ifname" ]; then
+	append "${var}" "${ifname}" ","
+    fi
+}
+
+process_networks() {
+    local section="$1"
+
+    if check "$section" all_networks; then
+	export "${section}_networks=*"
+    else
+	config_list_foreach "$section" networks process_network "${section}_networks"
+
+	if [ "$section" == "ip" ]; then
+	    # special case IP until multiple interfaces are properly supported for IP
+	    local len
+	    config_get len ip networks_LENGTH
+
+	    if [ "$len" == "1" ]; then
+		local network
+		config_get network ip networks_ITEM1
+		config_get addr "$network" ipaddr
+	    fi
+	fi
+    fi
+}
+
+
+process_unix_transport() {
+    if check unix enable; then
+	local path
+	local abstract
+
+
+	config_get path unix path "alljoyn"
+	config_get_bool abstract unix abstract "1"
+
+	if [ -n "$abstract" ]; then
+	    path="abstract=$path"
+	else
+	    path="path=$path"
+	fi
+	export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
+  <listen>unix:${path}</listen>"
+
+	config_get unix_auth_timeout unix auth_timeout "$unix_auth_timeout"
+    fi
+}
+
+
+process_ip_transport() {
+    if check ip enable; then
+	local port
+	local addr="0.0.0.0"
+
+	if check ip advertise_daemon; then
+	    export ${NO_EXPORT:+-n} ip_advertise_daemon="<tcp>
+    <property router_advertisement_prefix=\"org.alljoyn.BusNode.\"/>
+  </tcp>"
+	fi
+
+	process_networks ip
+
+	config_get port ip bus_port 9955
+
+	export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
+  <listen>tcp:addr=${addr},port=${port}</listen>"
+
+	config_get ip_max_incomplete_conn ip max_incomplete_conn "$ip_max_incomplete_conn"
+	config_get ip_max_complete_conn ip max_complete_conn "$ip_max_complete_conn"
+	config_get ip_auth_timeout ip auth_timeout "$ip_auth_timeout"
+    fi
+}
+
+
+process_ice_transport() {
+    if check ice enable; then
+	local url
+	local addrport
+	local proto
+
+	export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
+  <listen>ice:</listen>"
+
+	process_networks ice
+
+	config_get url ice server
+
+	proto="${url%%:*}"
+	addrport="${url##${proto}://}"
+
+	export ice_server="${addrport%:*}"
+
+	if [ "$proto" == "http" ]; then
+	    export ice_protocol="HTTP"
+	else
+	    export ice_protocol="HTTPS"
+	fi
+
+
+	config_get ice_max_incomplete_conn ice max_incomplete_conn "$ice_max_incomplete_conn"
+	config_get ice_max_complete_conn ice max_complete_conn "$ice_max_complete_conn"
+	config_get ice_auth_timeout ice auth_timeout "$ice_auth_timeout"
+    fi
+}
+
+
+process_bluetooth_transport() {
+    if check bluetooth enable; then
+	export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
+  <listen>bluetooth:</listen>"
+    fi
+}
+
+
+generate_conf_file() {
+    local listen_specs=""
+
+    local unix_auth_timeout=5000
+
+    local ip_max_incomplete_conn=16
+    local ip_max_complete_conn=64
+    local ip_auth_timeout=20000
+    local ip_networks=""
+    local ip_advertise_daemon=""
+
+    local ice_max_incomplete_conn=16
+    local ice_max_complete_conn=64
+    local ice_auth_timeout=40000
+    local ice_networks=""
+    local ice_server
+    local ice_protocol
+
+    include /lib/network
+    scan_interfaces
+    config_load alljoyn
+
+    process_unix_transport
+    process_ip_transport
+    process_ice_transport
+    process_bluetooth_transport
+
+    mkdir -p $(dirname $CONFIGFILE)
+
+    cat > $CONFIGFILE <<EOF
+<busconfig>
+  <type>alljoyn</type>
+  <fork/>
+  <syslog/>
+  <pidfile>${SERVICE_PID_FILE}</pidfile>
+  ${listen_specs}
+  ${ip_advertise_daemon}
+  <ip_name_service>
+    <property interfaces="${ip_networks}"/>
+  </ip_name_service>
+  <limit max_incomplete_connections="${ip_max_incomplete_conn}"/>
+  <limit max_completed_connections="${ip_max_complete_conn}"/>
+  <limit auth_timeout="${ip_auth_timeout}"/>
+  <ice>
+    <limit max_incomplete_connections="${ice_max_incomplete_conn}"/>
+    <limit max_completed_connections="${ice_max_complete_conn}"/>
+    <limit auth_timeout="${ice_auth_timeout}"/>
+  </ice>
+  <ice_discovery_manager>
+    <property interfaces="${ice_networks}"/>
+    <property protocol="${ice_protocol}"/>
+    <property server="${ice_server}"/>
+    <property enable_ipv6="false"/>
+  </ice_discovery_manager>
+  <property restrict_untrusted_clients="false"/>
+  <limit max_untrusted_clients="${ip_max_complete_conn}"/>
+</busconfig>
+EOF
+}
+
+
+start() {
+    generate_conf_file
+    service_start /usr/bin/alljoyn-daemon --config-file=$CONFIGFILE
+}
+
+stop() {
+    service_stop /usr/bin/alljoyn-daemon
+}

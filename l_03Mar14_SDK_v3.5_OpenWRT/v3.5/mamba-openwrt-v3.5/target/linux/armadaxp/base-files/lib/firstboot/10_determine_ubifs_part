@@ -1,0 +1,29 @@
+#!/bin/sh
+# override functions and find ubifs partition
+
+set_mtd_part() {
+    partname="syscfg"
+    mtdpart="$(find_mtd_part $partname)"
+}
+
+set_rom_part() {
+    rom=$(awk '/jffs2 ro/ {print $2}' /proc/mounts)
+}
+
+set_jffs_part() {
+    jffs_tmp=$(awk '/ubifs/ {print $2}' /proc/mounts)
+    if [ ! -z "$jffs_tmp" ]
+	then
+		jffs=$jffs_tmp/openwrt_overlay
+    fi
+}
+
+determine_rom_part() {
+    check_skip || {
+	set_rom_part
+	if [ -z "$rom" ]; then
+	    echo "You do not have a read-only jffs2 partition; aborting"
+	    exit 1
+	fi
+    }
+}

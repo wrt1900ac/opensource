@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Copyright (C) 2006-2010 OpenWrt.org
+# Copyright (C) 2010 Vertical Communications
+
+copy_ramoverlay() {
+	echo "ubifs_syscfg_copy_ramoverlay" >> /tmp/dbg
+    # try to avoid fs changing while copying
+    mount -o remount,ro none / 2>&-
+    # copy ramoverlay to jffs2
+    echo -n "copying files ... "
+    cp -a /tmp/root/* /rom/overlay/openwrt_overlay 2>&-
+    echo "done"
+}

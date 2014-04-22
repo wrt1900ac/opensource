@@ -1,0 +1,19 @@
+diff --git a/build_core/conf/openwrt/openwrt/SConscript b/build_core/conf/openwrt/openwrt/SConscript
+index c01a422..d4462e1 100644
+--- a/build_core/conf/openwrt/openwrt/SConscript
++++ b/build_core/conf/openwrt/openwrt/SConscript
+@@ -14,8 +14,14 @@
+ #
+ 
+ import os
++import platform
++
+ Import('env')
+ 
++if platform.system() == 'Darwin':
++    env.Replace(SHLIBSUFFIX='.so')
++    env.Replace(SHLINKFLAGS=['$LINKFLAGS', '-shared'])
++
+ # OpenWRT specific vars
+ vars = Variables()
+ vars.Add('TARGET_PATH', 'Paths to toolchain for cross compiling AllJoyn for OpenWRT', os.environ.get('TARGET_PATH'))

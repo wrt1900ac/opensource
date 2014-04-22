@@ -1,0 +1,13 @@
+diff --git a/drivers/misc/lvmon.c b/drivers/misc/lvmon.c
+index 2f0e36f..4acb2a2 100644
+--- a/drivers/misc/lvmon.c
++++ b/drivers/misc/lvmon.c
+@@ -138,6 +138,8 @@ void fan_show(void)
+ 		printk ("\t%s \t%d \t%d \t%d \t%d\n", 
+ 			fan[i].name, fan[i].off_low, fan[i].low_off, fan[i].low_high, fan[i].high_low);
+ 	}
++	printk ("To set:\n");
++	printk ("\tExample: echo cpu 85 80 95 90 > /proc/fan\n");
+ }
+ 
+ /*
