@@ -16,3 +16,4 @@ How to update from Belkin/Linksys UI
   Select image to load (e.g., openwrt-armadaxp--jffs2-128k.img)
   Select Update firmware
   After the firmware is updated, the unit will reboot, and the default ip address will be 192.168.200.1
+  The default Username for OpenWrt is admin, and there is no default password.
