@@ -10,10 +10,18 @@ Packages
   openwrt-armadaxp--jffs2-128k.img - this is a pre-build/runnable firmware image
 
 How to update from Belkin/Linksys UI
-  Login into WRT1900AC local UI
+  Login to WRT1900AC local UI
   Navigate to the Connectivity tab
   Select Manual firmware update
   Select image to load (e.g., openwrt-armadaxp--jffs2-128k.img)
   Select Update firmware
   After the firmware is updated, the unit will reboot, and the default ip address will be 192.168.200.1
-  The default Username for OpenWrt is admin, and there is no default password.
+  The default SSID's will be MAMBA_2G4, and MAMBA_5G2.
+  The default username for OpwnWrt is 'root', and there is no default password set.  
+  The unit will ask you to set a default password after you login to the UI.
+  
+How to ipdate from OpenWrt to Belkin/Linksys
+  Login to the WRT1900AC web UI
+  Select the 'System' Tab, and then 'Backup / Flash Firmware' tab
+  In the 'Flash new firmware image' section click the 'choose file' button and select your firmware
+  Click 'flash image'
