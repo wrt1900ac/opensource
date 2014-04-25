@@ -31,12 +31,18 @@ located at:
 ./bin/mvebu/openwrt-mvebu-mamba-jffs2-128k.img
 
 How to update from Belkin/Linksys UI
-  Login into WRT1900AC local UI
-  Navigate to the Connectivity tab
-  Select Manual firmware update
-  Select image to load (e.g., openwrt-armadaxp--jffs2-128k.img)
-  Select Update firmware
-  After the firmware is updated, the unit will reboot, and the default ip address will be 192.168.200.1
+
+Login into WRT1900AC local UI
+
+Navigate to the Connectivity tab
+
+Select Manual firmware update
+
+Select image to load (e.g., openwrt-armadaxp--jffs2-128k.img)
+
+Select Update firmware
+
+After the firmware is updated, the unit will reboot, and the default ip address will be 192.168.200.1
 
 The OpenWrt system is documented in docs/. You will need a LaTeX distribution
 and the tex4ht package to build the documentation. Type "make -C docs/" to build it.
