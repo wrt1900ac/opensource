@@ -17,7 +17,8 @@ make, find, grep, diff, unzip, gawk, getopt, libz-dev and libc headers.
 
 Run "./scripts/feeds update -a" to get all the latest package definitions
 defined in feeds.conf / feeds.conf.default respectively
-and "./scripts/feeds install -a" to install symlinks of all of them into
+
+Run "./scripts/feeds install -a" to install symlinks of all of them into
 package/feeds/.
 
 Use "make menuconfig" to configure your image.
