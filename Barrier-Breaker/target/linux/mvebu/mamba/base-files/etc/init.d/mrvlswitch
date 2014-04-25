@@ -1,0 +1,42 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org 
+
+START=19
+start() {
+        echo '============================='
+	echo 'Initialize 88E6172 switch...'
+	echo '-------------------'
+        echo '----- DEFAULT -----'
+        echo '-------------------'
+        echo 0 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 1 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 2 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 3 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 4 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 5 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 6 4 2 > /sys/devices/platform/neta/switch/reg_r
+
+        echo '-----------------------'
+        echo '----- PORT ENABLE -----'
+        echo '-----------------------'
+        echo 0 4 2 0x00ff > /sys/devices/platform/neta/switch/reg_w
+        echo 1 4 2 0x00ff > /sys/devices/platform/neta/switch/reg_w
+        echo 2 4 2 0x00ff > /sys/devices/platform/neta/switch/reg_w
+        echo 3 4 2 0x00ff > /sys/devices/platform/neta/switch/reg_w
+        echo 4 4 2 0x00ff > /sys/devices/platform/neta/switch/reg_w
+        echo 5 4 2 0x00ff > /sys/devices/platform/neta/switch/reg_w
+        echo 6 4 2 0x00ff > /sys/devices/platform/neta/switch/reg_w
+
+        echo '-----------------'
+        echo '----- FINAL -----'
+        echo '-----------------'
+        echo 0 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 1 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 2 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 3 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 4 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 5 4 2 > /sys/devices/platform/neta/switch/reg_r
+        echo 6 4 2 > /sys/devices/platform/neta/switch/reg_r
+
+        echo '============================='
+}

@@ -1,0 +1,9 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org 
+
+START=09
+start() {
+	# Unexport GPIO33 of RESET button
+	echo 33 > /sys/class/gpio/unexport
+	sleep 1
+}

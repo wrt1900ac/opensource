@@ -1,0 +1,20 @@
+--- a/arch/arm/boot/dts/armada-xp-mv78230.dtsi
++++ b/arch/arm/boot/dts/armada-xp-mv78230.dtsi
+@@ -57,7 +57,7 @@
+ 			#address-cells = <3>;
+ 			#size-cells = <2>;
+ 
+-				msi-parent = <&mpic>;
++			msi-parent = <&mpic>;
+ 			bus-range = <0x00 0xff>;
+ 
+ 			ranges =
+@@ -196,8 +196,6 @@
+ 				#interrupt-cells = <2>;
+ 				interrupts = <87>, <88>, <89>;
+ 			};
+-
+-			/*
+ 		};
+ 	};
+ };

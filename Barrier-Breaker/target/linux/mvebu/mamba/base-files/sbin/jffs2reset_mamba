@@ -1,0 +1,95 @@
+#!/bin/sh
+SYSCFG_UBIFS_MNT=/tmp/syscfg
+. /lib/functions.sh
+
+# mtdpart: the ubifs syscfg partition
+# rom: the read-only rootfs mount point
+# overlay: the overlay upper directory
+pre_check() {
+	# return 1 on failed
+	grep -qs ubifs /proc/filesystems ||  return 1
+	grep -qs overlayfs /proc/filesystems ||  return 1
+	[ ! -e $SYSCFG_UBIFS_MNT ] && mkdir -p $SYSCFG_UBIFS_MNT
+
+	mtdpart="$(find_mtd_part syscfg)"
+	[ -z "$mtdpart" ] && return 1
+	mtdpart_idx="$(echo $mtdpart | tr -d "/dev/mtdblock")"
+
+    rom=$(awk '/jffs2 ro/ {print $2}' /proc/mounts)
+    overlay=$(awk '/ubifs/ {print $2}' /proc/mounts | tail -n 1)
+	return 0
+}
+
+clean_mounted_overlayfs(){
+	if [ ! -z "$overlay" ]
+	then
+		echo -n "delete all file under $overlay/ ... "
+		rm -rf $overlay/*
+		echo "done"
+	fi
+}
+
+try_ubifs_syscfg_mount() {
+	overlay_mountpoint=$1
+	if [ -z $overlay_mountpoint ]
+	then
+		overlay_mountpoint=/overlay
+	fi
+	recover_ubifs=0
+	[ ! -e /dev/ubi0 ] && ubiattach -m $mtdpart_idx /dev/ubi_ctrl || recover_ubifs=1
+	if [ $recover_ubifs -eq 0 ] 
+	then
+		ubi0_nod_id=`cat /sys/class/ubi/ubi0/dev | tr -s ":" " "`
+		[ ! -e /dev/ubi0 ] && mknod /dev/ubi0 c ${ubi0_nod_id}
+		if [ ! -e /sys/class/ubi/ubi0_0/dev ]
+		then
+			# no volume
+			recover_ubifs=1
+		else
+			# check for "syscfg" volume
+			ubi0_0_nod_id=`cat /sys/class/ubi/ubi0_0/dev | tr -s ":" " "`
+			[ ! -e /dev/ubi0_0 ] && mknod /dev/ubi0_0 c ${ubi0_0_nod_id}
+			{ ubinfo /dev/ubi0_0 | grep Name  | grep -qs "syscfg" ; } || \
+			recover_ubifs=1
+		fi
+	fi
+	if [ $recover_ubifs -eq 1 ]
+	then
+		echo "ubifs syscfg partition is damaged"
+		echo "try to recover by formatting $mtdpart..."
+		[ -e /dev/ubi0 ] && ubidetach -m $mtdpart_idx
+		ubiformat -y -q /dev/mtd$mtdpart_idx
+		ubiattach -m $mtdpart_idx /dev/ubi_ctrl
+		ubi0_nod_id=`cat /sys/class/ubi/ubi0/dev | tr -s ":" " "`
+		[ ! -e /dev/ubi0 ] && mknod /dev/ubi0 c ${ubi0_nod_id}
+		ubimkvol /dev/ubi0 -n 0 -N syscfg -t dynamic --maxavsize
+	fi
+	# finally mount the ubifs
+	mount -t ubifs -o noatime ubi0:syscfg $SYSCFG_UBIFS_MNT || return 1
+	[ ! -d $SYSCFG_UBIFS_MNT/openwrt_overlay ] && mkdir -p $SYSCFG_UBIFS_MNT/openwrt_overlay
+	mount -o bind $SYSCFG_UBIFS_MNT/openwrt_overlay $overlay_mountpoint
+	return 0
+}
+
+if [ "$1" != "-y" ]
+then
+read -p "This will erase all settings and remove any installed packages. Are you sure? [N/y]" answer 
+case $answer in
+	[Yy]* ) break;;
+	[Nn]* ) exit 0;; 
+	* ) 	exit 0;; 
+esac
+fi
+
+pre_check
+if [ ! -z "$overlay" ]
+then
+	echo "overlayfs is mounted"
+	clean_mounted_overlayfs
+else
+	echo "try to mount overlayfs"
+	try_ubifs_syscfg_mount || exit 1
+    overlay=$(awk '/ubifs/ {print $2}' /proc/mounts | tail -n 1)
+	clean_mounted_overlayfs
+fi
+

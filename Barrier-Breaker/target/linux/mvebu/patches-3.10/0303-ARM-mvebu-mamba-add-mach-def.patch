@@ -1,0 +1,14 @@
+--- a/arch/arm/mach-mvebu/Kconfig
++++ b/arch/arm/mach-mvebu/Kconfig
+@@ -49,4 +49,11 @@ config MACH_ARMADA_XP
+ 
+ endmenu
+ 
++config MACH_ARMADA_MAMBA
++	bool "Marvell Armada XP Mamba boards"
++	depends on MACH_ARMADA_XP
++    	help
++	  Support for ARMADA Mamba board. Say Y here if you have such
++	  a board.
++
+ endif

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+DELAY=30 #30s
+
+while true
+do
+	cpu=`cat /sys/class/hwmon/hwmon0/temp1_input`
+	echo cpu_temp $cpu > /proc/fan
+
+	ddr=`cat /sys/class/hwmon/hwmon1/device/temp1_input`
+	echo ddr_temp $ddr > /proc/fan
+
+	wifi=`cat /sys/class/hwmon/hwmon1/device/temp2_input`
+	echo wifi_temp $wifi > /proc/fan
+
+	sleep $DELAY
+done

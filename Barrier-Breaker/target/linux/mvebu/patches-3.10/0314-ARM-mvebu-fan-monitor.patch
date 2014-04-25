@@ -1,0 +1,409 @@
+commit 19165ba9ef7c1842216b5901e8064dbdacdfc7e7
+diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
+index 6bd6cb7..f354c4f 100644
+--- a/drivers/misc/Kconfig
++++ b/drivers/misc/Kconfig
+@@ -533,6 +533,13 @@ config MAMBA_LED
+ 	help
+ 	  This driver control the LED on Mamba board 
+ 
++config FANCTRL
++	tristate "FAN Control Module"
++	depends on SENSORS_TMP421 && ARMADA_THERMAL
++	help
++	  This driver monitors the sensors then control the FAN depeneds 
++	  on the temperature.
++
+ source "drivers/misc/c2port/Kconfig"
+ source "drivers/misc/eeprom/Kconfig"
+ source "drivers/misc/cb710/Kconfig"
+diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
+index b04a55a..05ce5c6 100644
+--- a/drivers/misc/Makefile
++++ b/drivers/misc/Makefile
+@@ -54,3 +54,4 @@ obj-$(CONFIG_VMWARE_VMCI)	+= vmw_vmci/
+ obj-$(CONFIG_LATTICE_ECP3_CONFIG)	+= lattice-ecp3-config.o
+ obj-$(CONFIG_SRAM)		+= sram.o
+ obj-$(CONFIG_MAMBA_LED)		+= mamba_led.o
++obj-$(CONFIG_FANCTRL)		+= fan_ctrl.o
+diff --git a/drivers/misc/fan_ctrl.c b/drivers/misc/fan_ctrl.c
+new file mode 100644
+index 0000000..3c73690
+--- /dev/null
++++ b/drivers/misc/fan_ctrl.c
+@@ -0,0 +1,375 @@
++
++/*
++ * fan_ctrl.c - Utility driver to monitor sensors, on/off the FAN
++ *
++ * Copyright (C) 2013 Belkin Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; version 2 of the License.
++ *
++ *
++ */
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <asm/uaccess.h>
++#include <linux/cdev.h>
++#include <linux/proc_fs.h>
++#include <linux/mutex.h>
++#include <linux/sched.h>
++#include <linux/time.h>   // for using jiffies  
++#include <linux/delay.h>
++#include <linux/kmod.h>
++#include <linux/gpio.h>
++#include <asm/io.h>
++
++#define MAX_PROC_SIZE 100
++
++#define DEBUG 1
++
++#if DEBUG > 1
++#define fan_ctrl_dbg(fmt, arg...) printk("fan_ctrl:%s " fmt "\n", __func__ , ## arg)
++#else
++#define fan_ctrl_dbg(fmt, arg...)
++#endif
++
++
++#if DEBUG > 0
++#define fan_ctrl_info(fmt, arg...) printk("fan_ctrl:%s " fmt "\n", __func__ , ## arg)
++#else
++#define fan_ctrl_info(fmt, arg...)
++#endif
++/*
++ * Structures
++ * */
++
++struct monitor_fan_temp {
++	int off_low;
++	int low_off;
++	int low_high;
++	int high_low;
++	char name[10];
++};
++
++enum {
++	CPU=0,
++	DDR,
++	WIFI,
++	MAX_SENSORS,
++};
++
++enum {
++	FAN_OFF=0,
++	FAN_LOW,
++	FAN_HIGH,
++	FAN_MAX,
++};
++
++#define FAN_BASE_ADDR 0xf1018000
++#define FAN_MAP_SIZE 0x1000
++#define FAN_ENABLE_BLINK_ADDR	0x108
++#define FAN_COUNTER_B_ADDR	0x120
++#define FAN_ON_DURATION_ADDR	0x1c8
++#define FAN_OFF_DURATION_ADDR	0x1cc
++#define FAN_CTRL_GPIO 24
++/*
++ * Variables
++ * */
++static DEFINE_MUTEX(mutex);
++static char proc_data[MAX_PROC_SIZE];
++static struct proc_dir_entry *proc_fan_entry;
++static struct monitor_fan_temp fan[3];
++static int cpu_temp, ddr_temp, wifi_temp;
++
++static int fan_mode = FAN_OFF;
++void __iomem *fan_base = NULL;
++
++/*
++ * Prototype
++ * */
++
++int control_fan(int mode);
++int process_sensors_temp(void);
++
++/*
++ * Functions 
++ * */
++
++static int fan_show(struct seq_file *m, void *v)
++{
++	int i;
++	seq_printf (m, "Last reading: cpu %d,  ddr %d, wifi %d\n",
++			cpu_temp, ddr_temp, wifi_temp);
++	seq_printf (m, "Settings:\n");
++	seq_printf (m, "JUNCTION OFF->LOW LOW->OFF LOW->HIGH HIGH->LOW\n");
++	for (i = 0; i < MAX_SENSORS; i++) {
++		seq_printf (m, "\t%s \t%d \t%d \t%d \t%d\n",
++			fan[i].name,
++			fan[i].off_low,	fan[i].low_off,
++			fan[i].low_high, fan[i].high_low);
++	}
++	seq_printf (m, "To set:\n");
++       seq_printf (m, "\tExample: echo cpu 85 80 95 90 > /proc/fan\n");
++	return 0;
++}
++
++int control_fan(int mode)
++{
++	fan_ctrl_dbg (">>>> %s\n", __func__);
++	if (fan_base == NULL)
++		return -1;
++
++	if (mode == FAN_LOW){
++		fan_ctrl_dbg (">>>> %s: FAN_LOW\n", __func__);
++		// Enable blink register for GPIO24
++		writel(0x01000000, fan_base + FAN_ENABLE_BLINK_ADDR);
++		// Set blink counter B for GPIO24
++		writel(0x01000000, fan_base + FAN_COUNTER_B_ADDR);
++		// Set ON & OFF duration for low speed
++		writel(0x00001770, fan_base + FAN_ON_DURATION_ADDR);
++		writel(0x00000FA0, fan_base + FAN_OFF_DURATION_ADDR);
++		fan_mode = FAN_LOW;
++	}
++	else if (mode == FAN_HIGH){
++		fan_ctrl_dbg (">>>> %s: FAN_HIGH\n", __func__);
++		// Enable blink register for GPIO24
++		writel(0x01000000, fan_base + FAN_ENABLE_BLINK_ADDR);
++		// Set blink counter B for GPIO24
++		writel(0x01000000, fan_base + FAN_COUNTER_B_ADDR);
++		// Set ON & OFF duration for high speed
++		writel(0x00002710, fan_base + FAN_ON_DURATION_ADDR);
++		writel(0x00000001, fan_base + FAN_OFF_DURATION_ADDR);
++		fan_mode = FAN_HIGH;
++	}
++	else {
++		fan_ctrl_dbg (">>>> %s: FAN_OFF\n", __func__);
++		// Disable blink register for GPIO24
++		writel(0x00000000, fan_base + FAN_ENABLE_BLINK_ADDR);
++		fan_mode = FAN_OFF;
++	}
++	return 0;
++}
++
++int process_sensors_temp(void)
++{
++	fan_ctrl_dbg ("Last reading: cpu %d,  ddr %d, wifi %d\n",
++			cpu_temp, ddr_temp, wifi_temp);
++	fan_ctrl_dbg (">>>> %s: fan_mode = %d\n", __func__, fan_mode);
++	if (fan_mode == FAN_OFF) { /* OFF -> LOW */
++		if ((cpu_temp > fan[CPU].off_low) ||
++			(ddr_temp > fan[DDR].off_low) ||
++			(wifi_temp > fan[WIFI].off_low)) {
++			control_fan(FAN_LOW);
++		}
++	}
++
++	if (fan_mode == FAN_LOW) {
++		/* LOW -> HIGH */
++		if ((cpu_temp > fan[CPU].low_high) ||
++			(ddr_temp > fan[DDR].low_high) ||
++			(wifi_temp > fan[WIFI].low_high)) {
++			control_fan(FAN_HIGH);
++		}
++
++		/* LOW -> OFF */
++		if ((cpu_temp < fan[CPU].low_off - 1) &&
++			(ddr_temp < fan[DDR].low_off) &&
++			(wifi_temp < fan[WIFI].low_off)) {
++			control_fan(FAN_OFF);
++		}
++	}
++
++	if (fan_mode == FAN_HIGH) { /* HIGH -> LOW */
++		if ((cpu_temp < fan[CPU].high_low - 1) &&
++			(ddr_temp < fan[DDR].high_low) &&
++			(wifi_temp < fan[WIFI].high_low)) {
++			control_fan(FAN_LOW);
++		}
++	}
++
++	return 0;
++}
++
++static int fan_open_proc(struct inode *inode, struct file *file)
++{
++	return single_open(file, fan_show, PDE_DATA(inode));
++}
++/*
++ *
++ * */
++//static int fan_write_proc(struct file *file,const char *buf,int count,void *data )
++static int fan_write_proc(struct file *filp, const char *buf, size_t count, loff_t *offp)
++{
++	int ret, temp, off_low, low_off, low_high, high_low;
++	char type[32];
++
++	fan_ctrl_dbg (">>>> %s\n", __func__);
++	if (!count) {
++		printk ("echo cpu|ddr|wifi 85 80 95 90 > /proc/fan\n");
++		goto err;
++	}
++	if(count > MAX_PROC_SIZE)
++		count = MAX_PROC_SIZE;
++
++	mutex_lock(&mutex);
++
++	if(copy_from_user(proc_data, buf, count)) {
++		goto err;
++	}
++
++	temp = 0;
++	ret = sscanf(proc_data, "%s %d\n", type, &temp);
++	if (ret < 2) {
++		goto err;
++	}
++
++	if (strcmp(type, "cpu_temp") == 0) { 
++		cpu_temp = temp/1000;
++		fan_ctrl_dbg ("Read the CPU temp: %d C\n", cpu_temp);
++	}
++	else if (strcmp(type, "ddr_temp") == 0) { 
++		ddr_temp = temp/1000;
++		fan_ctrl_dbg ("Read the DDR temp: %d C\n", ddr_temp);
++	}
++	else if (strcmp(type, "wifi_temp") == 0) { 
++		wifi_temp = temp/1000;
++		fan_ctrl_dbg ("Read the WIFI temp: %d C\n", wifi_temp);
++	}
++	else if (strcmp(type, "off") == 0) { 
++		control_fan(FAN_LOW);
++	}
++	else if (strcmp(type, "low") == 0) { 
++		control_fan(FAN_LOW);
++	}
++	else if (strcmp(type, "high") == 0) { 
++		control_fan(FAN_HIGH);
++	}else {
++		off_low = 0;
++		low_off = 0;
++		low_high = 0;
++		high_low = 0;
++
++		ret = sscanf(proc_data, "%s %d %d %d %d\n", 
++			type, &off_low, &low_off, &low_high, &high_low);
++		if (ret < 5) {
++			goto err;
++		}
++		if (strcmp(type, "cpu") == 0) { 
++			temp = CPU;
++		}
++		else if (strcmp(type, "ddr") == 0) { 
++			temp = DDR;
++		}
++		else if (strcmp(type, "ddr") == 0) { 
++			temp = WIFI;
++		}
++		else {
++			fan_ctrl_dbg ("Data is not correct\n");
++			goto retn;
++		}
++		
++		fan[temp].off_low = off_low; 
++		fan[temp].low_off = low_off;
++		fan[temp].low_high = low_high;
++		fan[temp].high_low = high_low;
++	}
++	process_sensors_temp();
++retn:
++	mutex_unlock(&mutex);
++	return count;
++err:
++	mutex_unlock(&mutex);
++	return -EFAULT;
++}
++
++struct file_operations proc_fops = {
++	open: fan_open_proc,
++	read: seq_read,
++	write: fan_write_proc
++};
++
++/*
++ *
++ * */
++int create_fan_proc_entry(void)
++{
++	proc_fan_entry= proc_create("fan", 0, NULL, &proc_fops);
++	if(!proc_fan_entry)
++	{
++		printk(KERN_INFO "Error creating proc entry\n");
++		return -ENOMEM;
++	}
++	printk ("FAN proc initialized\n");
++
++	return 0;
++}
++
++/*
++ *
++ * */
++int fan_ctrl_init (void) {
++
++	create_fan_proc_entry();
++
++	/* Initialized the FAN temp */
++	/* CPU */
++	strcpy(fan[CPU].name, "cpu");
++	fan[CPU].off_low = 85;
++	fan[CPU].low_off = 80;
++	fan[CPU].low_high = 95;
++	fan[CPU].high_low = 90;
++
++	/* DDR */
++	strcpy(fan[DDR].name, "ddr");
++	fan[DDR].off_low = 65;
++	fan[DDR].low_off = 60;
++	fan[DDR].low_high = 75;
++	fan[DDR].high_low = 70;
++
++	/* WIFI */
++	strcpy(fan[WIFI].name, "wifi");
++	fan[WIFI].off_low = 105;
++	fan[WIFI].low_off = 100;
++	fan[WIFI].low_high = 115;
++	fan[WIFI].high_low = 110;
++
++	cpu_temp = ddr_temp = wifi_temp = 0;
++
++	/* initialize fan control */
++	fan_base = ioremap(FAN_BASE_ADDR, FAN_MAP_SIZE);
++	if (fan_base == NULL)
++		goto ioremap_failed;
++
++	/* request for fan control */
++	if(gpio_request(FAN_CTRL_GPIO, "fan_ctrl_gpio") != 0) {
++		printk("failed to request fan control gpio\n");
++		goto gpio_request_failed;
++	}
++	gpio_direction_output(FAN_CTRL_GPIO, 0);
++
++	control_fan(fan_mode);
++	return 0;
++
++gpio_request_failed:
++	if (fan_base)
++		iounmap(fan_base);
++ioremap_failed:
++	remove_proc_entry("fan",NULL);
++	return -1;
++}
++
++/*
++ *
++ * */
++void fan_ctrl_cleanup(void) {
++	fan_ctrl_info ("Inside cleanup_module\n");
++	if (fan_base)
++		iounmap(fan_base);
++	remove_proc_entry("fan",NULL);
++}
++MODULE_AUTHOR("Belkin Inc.");
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("fan_ctrl driver");
++
++module_init(fan_ctrl_init);
++module_exit(fan_ctrl_cleanup);

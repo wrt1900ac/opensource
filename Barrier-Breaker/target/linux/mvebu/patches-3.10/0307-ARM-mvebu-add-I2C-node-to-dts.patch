@@ -1,0 +1,17 @@
+diff --git a/arch/arm/boot/dts/armada-xp-mamba.dts b/arch/arm/boot/dts/armada-xp-mamba.dts
+index af5eb14..4aecb71 100644
+--- a/arch/arm/boot/dts/armada-xp-mamba.dts
++++ b/arch/arm/boot/dts/armada-xp-mamba.dts
+@@ -132,6 +132,12 @@
+ 				phy-mode = "rgmii-id";
+ 			};
+ 
++			i2c@11000 {
++				status = "okay";
++				clock-frequency = <175000>;
++
++			};
++
+ 			nand@d0000 {
+ 				status = "okay";
+ 				num-cs = <1>;

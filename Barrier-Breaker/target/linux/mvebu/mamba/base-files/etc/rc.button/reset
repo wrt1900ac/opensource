@@ -1,0 +1,18 @@
+#!/bin/sh
+
+[ "${ACTION}" = "released" ] || exit 0
+
+. /lib/functions.sh
+
+logger "$BUTTON pressed for $SEEN seconds"
+
+if [ "$SEEN" -gt 0 ] && [ "$SEEN" -le 10 ]
+then
+	echo "REBOOT" > /dev/console
+	sync
+	reboot
+elif [ "$SEEN" -gt 0 ]
+then
+	echo "FACTORY RESET" > /dev/console
+	jffs2reset -y && reboot &
+fi

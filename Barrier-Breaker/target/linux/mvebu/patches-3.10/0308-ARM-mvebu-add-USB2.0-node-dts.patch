@@ -1,0 +1,16 @@
+diff --git a/arch/arm/boot/dts/armada-xp-mamba.dts b/arch/arm/boot/dts/armada-xp-mamba.dts
+index 4aecb71..4463dd5 100644
+--- a/arch/arm/boot/dts/armada-xp-mamba.dts
++++ b/arch/arm/boot/dts/armada-xp-mamba.dts
+@@ -132,6 +132,11 @@
+ 				phy-mode = "rgmii-id";
+ 			};
+ 
++                        /* Front USB 2.0 port */
++                        usb@50000 {
++                                status = "okay";
++                        };
++
+ 			i2c@11000 {
+ 				status = "okay";
+ 				clock-frequency = <175000>;

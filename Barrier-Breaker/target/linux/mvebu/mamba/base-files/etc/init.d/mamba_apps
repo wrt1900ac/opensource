@@ -1,0 +1,13 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org 
+
+START=99
+start() {
+	/usr/sbin/ledctrl power off
+	# Run leds_monitor
+	/usr/sbin/leds_monitor /dev/input/event0&
+	# Sensor monitor
+	/usr/sbin/sensors_monitor&
+	# Wan monitor 
+	/usr/sbin/wan_monitor&
+}

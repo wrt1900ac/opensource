@@ -1,0 +1,14 @@
+--- a/drivers/mtd/nand/pxa3xx_nand.c
++++ b/drivers/mtd/nand/pxa3xx_nand.c
+@@ -1517,6 +1517,11 @@ KEEP_CONFIG:
+ 		}
+ 	}
+ 
++#ifdef CONFIG_MACH_ARMADA_MAMBA
++	/* force to use 4-bit ECC */
++	if (chip->ecc_strength_ds < 4)
++		chip->ecc_strength_ds = 4;
++#endif
+ 	ecc_strength = chip->ecc_strength_ds;
+ 	ecc_step = chip->ecc_step_ds;
+ 
