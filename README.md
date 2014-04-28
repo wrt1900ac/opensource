@@ -1,8 +1,19 @@
 openwrt
 =======
-This is the buildsystem for the OpenWrt Linux distribution.
+The main build tree can be found at https://github.com/jimmychungbelkin/Mamba
 
-Please use "make menuconfig" to configure your appreciated
+This repository contains the set of patches, and prebuilt iamges based on the Linksys WRT1900AC.
+
+
+
+Barrier-Breaker/openwrt-armadaxp--jffs2-128k.img - prebuilt image based on OpenWrt Barrier-Breaker
+Barrier-Breaker/patch_submission_1.6.tar.gz - patch files for standard OpenWrt Package
+
+Attitude-Adjustment/openwrt-armadaxp--jffs2-128k.img - prebuilt image based on OpenWrt Attitude-Adjustment
+
+After applying the patches in this directory to the OpenWrt Build you can generate an image by doing the following:
+
+Use "make menuconfig" to configure your appreciated
 configuration for the toolchain and firmware.
 
 For WRT1900AC:
